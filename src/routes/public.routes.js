@@ -4,7 +4,7 @@ const router = express.Router();
 // --- Controllers ---
 const usersController = require("../controllers/users.controller");
 
-// --- Multer (file upload) ---
+const { cloudinaryService } = require("../services/cloudinary.service");
 const upload = require("../utils/multer.utils");
 
 // ============================================================
@@ -14,9 +14,13 @@ const upload = require("../utils/multer.utils");
 // Health check / Welcome route
 router.get("/", usersController.welcome);
 
-// Register a new user
-// Accepts multipart/form-data with optional "photo" file field
 router.post("/sign-up", upload.single("photo"), usersController.signup);
+
+// Get Cloudinary upload signature
+router.get("/cloudinary-signature", (req, res) => {
+  const signatureData = cloudinaryService.generateUploadSignature();
+  res.json({ success: true, ...signatureData });
+});
 
 // Login with phone number and password
 router.post("/sign-in", usersController.signin);

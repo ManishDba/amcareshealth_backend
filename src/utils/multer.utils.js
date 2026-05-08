@@ -1,36 +1,16 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
 
 /**
- * Multer File Upload Configuration
- *
- * Handles file uploads for user profile photos.
- * Files are stored in the "uploads/photos/" directory.
- * Only image files (jpeg, jpg, png, gif) are accepted.
- * Max file size: 5MB
+ * Multer File Upload Configuration (Memory Storage)
+ * 
+ * This configuration uses memory storage to store files as Buffers
+ * in memory, which are then uploaded directly to Cloudinary.
+ * No files are stored locally.
  */
 
-// Ensure the uploads directory exists
-const uploadDir = path.join(__dirname, "../../uploads/photos");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configure storage: where and how files are saved
-const storage = multer.diskStorage({
-  // Set the destination folder for uploads
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-
-  // Generate a unique filename: userId_timestamp.extension
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `photo_${uniqueSuffix}${ext}`);
-  },
-});
+// Configure memory storage
+const storage = multer.memoryStorage();
 
 // Filter: Only allow image file types
 const fileFilter = (req, file, cb) => {

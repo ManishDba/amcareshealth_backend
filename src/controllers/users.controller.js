@@ -8,6 +8,7 @@ const {
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../env");
+const { cloudinaryService } = require("../services/cloudinary.service");
 
 // ============================================================
 // Welcome Route (Health Check)
@@ -71,8 +72,21 @@ const signup = async (req, res) => {
     // Hash the password with bcrypt (salt rounds: 10)
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Get the photo path if a file was uploaded
-    const photoPath = req.file ? `/uploads/photos/${req.file.filename}` : null;
+    // --- Handle Photo Upload ---
+    let photoUrl = null;
+    if (req.file) {
+      // If uploaded via Multer (multipart/form-data)
+      const result = await cloudinaryService.uploadBuffer(req.file.buffer, "user_photos");
+      photoUrl = result.secure_url;
+    } else if (req.body.photo) {
+      // If uploaded via JSON (Base64 or URL)
+      if (req.body.photo.startsWith("data:image")) {
+        const result = await cloudinaryService.uploadBase64(req.body.photo, "user_photos");
+        photoUrl = result.secure_url;
+      } else {
+        photoUrl = req.body.photo;
+      }
+    }
 
     // Create the user record in the database
     const user = await models.users.create({
@@ -83,7 +97,7 @@ const signup = async (req, res) => {
       age: age ? parseInt(age) : null,
       bloodGroup: bloodGroup || null,
       aadharNo: aadharNo || null,
-      photo: photoPath,
+      photo: photoUrl,
       address: address || null,
     });
 
@@ -259,9 +273,17 @@ const updateProfile = async (req, res) => {
     if (aadharNo !== undefined) updateData.aadharNo = aadharNo;
     if (address !== undefined) updateData.address = address;
 
-    // Handle photo upload (if a new file was uploaded)
+    // --- Handle Photo Upload ---
     if (req.file) {
-      updateData.photo = `/uploads/photos/${req.file.filename}`;
+      const result = await cloudinaryService.uploadBuffer(req.file.buffer, "user_photos");
+      updateData.photo = result.secure_url;
+    } else if (req.body.photo) {
+      if (req.body.photo.startsWith("data:image")) {
+        const result = await cloudinaryService.uploadBase64(req.body.photo, "user_photos");
+        updateData.photo = result.secure_url;
+      } else {
+        updateData.photo = req.body.photo;
+      }
     }
 
     // Update the user record
