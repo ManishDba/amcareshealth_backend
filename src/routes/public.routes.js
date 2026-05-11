@@ -3,6 +3,7 @@ const router = express.Router();
 
 // --- Controllers ---
 const usersController = require("../controllers/users.controller");
+const doctorController = require("../controllers/doctors.controller");
 
 const { cloudinaryService } = require("../services/cloudinary.service");
 const upload = require("../utils/multer.utils");
@@ -24,5 +25,10 @@ router.get("/cloudinary-signature", (req, res) => {
 
 // Login with phone number and password
 router.post("/sign-in", usersController.signin);
+
+// --- Doctor Module ---
+router.get("/api/doctors", doctorController.getAllDoctors);
+router.get("/api/doctors/:id", doctorController.getDoctorById);
+router.get("/api/doctors/:id/slots", doctorController.getAvailableSlots);
 
 module.exports = router;
