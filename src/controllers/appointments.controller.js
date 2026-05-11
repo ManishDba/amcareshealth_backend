@@ -1,6 +1,7 @@
 const { models, sequelize } = require("../models");
 const { errorHandler, successHandler } = require("../utils/handler.utils");
 const crypto = require("crypto");
+const { sendAppointmentEmail, sendAppointmentNotification } = require("../services/email.service");
 
 const bookAppointment = async (req, res) => {
   const t = await sequelize.transaction();
@@ -45,6 +46,21 @@ const bookAppointment = async (req, res) => {
     );
 
     await t.commit();
+
+    // --- Send Confirmation Email (Async) ---
+    try {
+      const fullUser = await models.users.findByPk(userId);
+      const fullDoctor = await models.doctors.findByPk(doctorId);
+      if (fullUser && fullUser.email) {
+        await sendAppointmentEmail(appointment, fullUser, fullDoctor);
+      }
+      if (fullUser && fullDoctor) {
+        await sendAppointmentNotification(appointment, fullUser, fullDoctor);
+      }
+    } catch (emailError) {
+      console.error("Failed to send appointment email:", emailError);
+    }
+
     return successHandler(res, { 
       message: "Appointment booked successfully", 
       appointment 

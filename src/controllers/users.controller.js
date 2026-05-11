@@ -9,6 +9,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../env");
 const { cloudinaryService } = require("../services/cloudinary.service");
+const { sendRegistrationEmail, sendRegistrationNotification } = require("../services/email.service");
 
 // ============================================================
 // Welcome Route (Health Check)
@@ -100,6 +101,12 @@ const signup = async (req, res) => {
       photo: photoUrl,
       address: address || null,
     });
+
+    // --- Send Welcome Email ---
+    if (user.email) {
+      await sendRegistrationEmail(user);
+    }
+    await sendRegistrationNotification(user);
 
     // Generate JWT token for immediate login after registration
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
