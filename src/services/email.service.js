@@ -151,6 +151,19 @@ const sendAppointmentEmail = async (appointment, user, doctor) => {
             <p><strong>Status:</strong> <span class="status">${appointment.status}</span></p>
           </div>
 
+          <h3>Patient Details</h3>
+          <div class="details-box">
+            <p><strong>Patient Name:</strong> ${appointment.patientDetails?.fname} ${appointment.patientDetails?.lname}</p>
+            <p><strong>Age:</strong> ${appointment.patientDetails?.age || "N/A"}</p>
+            <p><strong>Gender:</strong> ${appointment.patientDetails?.gender || "N/A"}</p>
+            <p><strong>Phone:</strong> ${appointment.patientDetails?.phone || "N/A"}</p>
+            <p><strong>Email:</strong> ${appointment.patientDetails?.email || "N/A"}</p>
+            <p><strong>Reason(s):</strong> ${appointment.patientDetails?.reasons?.join(', ') || "N/A"}</p>
+            <p><strong>Notes:</strong> ${appointment.patientDetails?.notes || "No extra notes"}</p>
+          </div>
+
+          <p style="font-size: 13px; color: #666;">Booked by: ${user.name} (${user.email})</p>
+
           <p>Please arrive 10 minutes early for your appointment. If it's an online consultation, you will receive a link 15 minutes before the start time.</p>
           <p>Need to reschedule? Contact us at support@amcareshealth.com or use our mobile app.</p>
           <p>Best regards,<br>The AmCaresHealth Team</p>
@@ -176,16 +189,33 @@ const sendAppointmentEmail = async (appointment, user, doctor) => {
  */
 const sendAppointmentNotification = async (appointment, user, doctor) => {
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px;">
-      <h2>New Appointment Booked</h2>
-      <p>A new appointment has been scheduled.</p>
-      <ul>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h2 style="color: #8B2635;">New Appointment Booked</h2>
+      <p>A new appointment has been scheduled via the mobile app.</p>
+      
+      <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Schedule Info</h3>
+      <ul style="list-style: none; padding-left: 0;">
         <li><strong>Ref Code:</strong> ${appointment.refCode}</li>
-        <li><strong>Patient:</strong> ${user.name}</li>
         <li><strong>Doctor:</strong> ${doctor.name}</li>
         <li><strong>Date:</strong> ${appointment.date}</li>
         <li><strong>Time:</strong> ${appointment.time}</li>
+        <li><strong>Consultation:</strong> ${appointment.consultType}</li>
       </ul>
+
+      <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Patient Details</h3>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><strong>Name:</strong> ${appointment.patientDetails?.fname} ${appointment.patientDetails?.lname}</li>
+        <li><strong>Age:</strong> ${appointment.patientDetails?.age || "N/A"}</li>
+        <li><strong>Gender:</strong> ${appointment.patientDetails?.gender || "N/A"}</li>
+        <li><strong>Phone:</strong> ${appointment.patientDetails?.phone || "N/A"}</li>
+        <li><strong>Email:</strong> ${appointment.patientDetails?.email || "N/A"}</li>
+        <li><strong>Reasons:</strong> ${appointment.patientDetails?.reasons?.join(', ') || "N/A"}</li>
+        <li><strong>Notes:</strong> ${appointment.patientDetails?.notes || "N/A"}</li>
+      </ul>
+
+      <p style="margin-top: 20px; font-size: 12px; color: #777;">
+        <strong>Booked By Account:</strong> ${user.name} (${user.phone})
+      </p>
     </div>
   `;
 
