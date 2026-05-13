@@ -61,9 +61,9 @@ const bookAppointment = async (req, res) => {
       console.error("Failed to send appointment email:", emailError);
     }
 
-    return successHandler(res, { 
-      message: "Appointment booked successfully", 
-      appointment 
+    return successHandler(res, {
+      message: "Appointment booked successfully",
+      appointment
     });
   } catch (error) {
     await t.rollback();
