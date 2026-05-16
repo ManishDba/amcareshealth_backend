@@ -6,7 +6,7 @@ const cors = require("cors");
 const path = require("path");
 
 const { PORT } = require("../env");
-const { models } = require("./models/index");
+const { models, sequelize } = require("./models/index");
 const errorHandler = require("./middleware/errorHandler.middleware");
 const { apiRateLimit } = require("./middleware/rateLimit.middleware");
 
@@ -15,9 +15,11 @@ const app = express();
 const server = http.createServer(app);
 
 console.log('📦 Loading models...');
-// Initialize models & run sync
-models;
+// Initialize models & connection
+sequelize.authenticateApp(); 
 console.log('✅ Models loaded.');
+
+
 
 // ─── Global Middleware ────────────────────────────────────────
 console.log('🛡️ Configuring middleware...');

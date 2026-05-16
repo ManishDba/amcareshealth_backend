@@ -41,31 +41,19 @@ const sequelize = DATABASE_URL
     });
 
 
-const connectionTest = async () => {
-    const maxRetries = 5;
-    let retryCount = 0;
-    while (retryCount < maxRetries) {
-        try {
-            console.log('🔍 Attempting DB connection...');
-            await sequelize.authenticate();
-            console.log('✅ Database connection established successfully.');
-
-            console.log('🔄 Syncing models...');
-            // Temporarily disabling alter:true to check for hangs
-            await sequelize.sync();
-            console.log('✅ Database models synchronized.');
-            break;
-        } catch (error) {
-            retryCount++;
-            console.error(`❌ Database connection attempt ${retryCount}/${maxRetries} failed:`, error.message);
-            if (retryCount >= maxRetries) {
-                console.error('❌ Max retries reached. Could not connect to database.');
-                process.exit(1);
-            }
-            await new Promise(resolve => setTimeout(resolve, 3000));
-        }
+// Connection test removed from top-level to prevent redundant syncs during migrations.
+// It should be called explicitly in the main entry point (index.js).
+const authenticate = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('✅ Database connection established.');
+        await sequelize.sync();
+        console.log('✅ Database models synchronized.');
+    } catch (error) {
+        console.error('❌ Database connection failed:', error.message);
+        process.exit(1);
     }
 }
-connectionTest();
 
 module.exports = sequelize;
+module.exports.authenticateApp = authenticate;
