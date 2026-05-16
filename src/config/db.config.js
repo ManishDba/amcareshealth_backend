@@ -50,9 +50,14 @@ const authenticate = async () => {
         await sequelize.sync();
         console.log('✅ Database models synchronized.');
     } catch (error) {
-        console.error('❌ Database connection failed:', error.message);
+        console.error('❌ Database connection failed!');
+        console.error('Error Details:', error.message);
+        if (!DATABASE_URL && !PGHOST) {
+            console.error('CRITICAL: No database connection parameters found in environment variables.');
+        }
         process.exit(1);
     }
+
 }
 
 module.exports = sequelize;
