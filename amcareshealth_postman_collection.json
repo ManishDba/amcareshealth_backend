@@ -1,0 +1,301 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "AmCaresHealth API Collection",
+		"description": "Comprehensive API collection for AmCaresHealth Backend including Auth, Doctors, Appointments, and Transplant modules.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth & Registration",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "John Doe", "type": "text" },
+								{ "key": "email", "value": "john@example.com", "type": "text" },
+								{ "key": "phone", "value": "9876543210", "type": "text" },
+								{ "key": "password", "value": "password123", "type": "text" },
+								{ "key": "age", "value": "25", "type": "text" },
+								{ "key": "bloodGroup", "value": "O+", "type": "text" },
+								{ "key": "photo", "type": "file", "src": [] }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/sign-up",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "sign-up"]
+						}
+					}
+				},
+				{
+					"name": "Sign In",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"9876543210\",\n    \"password\": \"password123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/sign-in",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "sign-in"]
+						}
+					}
+				},
+				{
+					"name": "Auth Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "John Updated", "type": "text" },
+								{ "key": "age", "value": "26", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Doctors",
+			"item": [
+				{
+					"name": "Get All Doctors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/doctors",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "doctors"]
+						}
+					}
+				},
+				{
+					"name": "Get Doctor By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/doctors/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "doctors", ":id"],
+							"variable": [{ "key": "id", "value": "1" }]
+						}
+					}
+				},
+				{
+					"name": "Get Available Slots",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/doctors/:id/slots",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "doctors", ":id", "slots"],
+							"variable": [{ "key": "id", "value": "1" }]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Book Appointment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"doctorId\": 1,\n    \"slotId\": 1,\n    \"date\": \"2024-05-20\",\n    \"time\": \"10:00 AM\",\n    \"consultType\": \"In-Person\",\n    \"patientDetails\": {\n        \"fname\": \"John\",\n        \"lname\": \"Doe\",\n        \"phone\": \"9876543210\",\n        \"reasons\": [\"Fever\", \"Cough\"]\n    }\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/appointments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "appointments"]
+						}
+					}
+				},
+				{
+					"name": "My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/appointments/my-bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "appointments", "my-bookings"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Organ Transplant",
+			"item": [
+				{
+					"name": "Register for Transplant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"recipient\",\n    \"organ\": \"heart\",\n    \"patientName\": \"John Doe\",\n    \"bloodGroup\": \"O+\",\n    \"urgency\": \"high\",\n    \"city\": \"Delhi\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transplant/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "transplant", "register"]
+						}
+					}
+				},
+				{
+					"name": "My Registrations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/transplant/my-registrations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "transplant", "my-registrations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/notifications?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "notifications"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/notifications/unread-count",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "notifications", "unread-count"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "System Health",
+			"item": [
+				{
+					"name": "Global Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "health"]
+						}
+					}
+				},
+				{
+					"name": "Debug Routes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/debug-routes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "debug-routes"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": { "type": "text/javascript", "exec": [""] }
+		},
+		{
+			"listen": "test",
+			"script": { "type": "text/javascript", "exec": [""] }
+		}
+	],
+	"variable": [
+		{ "key": "baseUrl", "value": "https://amcareshealth-backend.onrender.com", "type": "string" },
+		{ "key": "authToken", "value": "your_token_here", "type": "string" }
+	]
+}
