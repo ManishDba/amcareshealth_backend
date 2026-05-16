@@ -3,6 +3,8 @@ const User = require('../models/model/user.model');
 const Doctor = require('../models/model/doctor.model');
 const DoctorSlot = require('../models/model/doctor-slot.model');
 const Appointment = require('../models/model/appointment.model');
+const OrganTransplant = require('../models/organTransplant.model');
+
 
 const models = {}
 
@@ -10,6 +12,8 @@ models.users = User(sequelize);
 models.doctors = Doctor(sequelize);
 models.doctorSlots = DoctorSlot(sequelize);
 models.appointments = Appointment(sequelize);
+models.organTransplants = OrganTransplant(sequelize, sequelize.constructor.DataTypes);
+
 
 // Associations
 models.doctors.hasMany(models.doctorSlots, { foreignKey: 'doctorId', as: 'slots' });
@@ -20,6 +24,10 @@ models.appointments.belongsTo(models.doctors, { foreignKey: 'doctorId', as: 'doc
 
 models.users.hasMany(models.appointments, { foreignKey: 'userId', as: 'appointments' });
 models.appointments.belongsTo(models.users, { foreignKey: 'userId', as: 'user' });
+
+models.users.hasMany(models.organTransplants, { foreignKey: 'userId', as: 'transplants' });
+models.organTransplants.belongsTo(models.users, { foreignKey: 'userId', as: 'user' });
+
 
 models.sequelize = sequelize
 

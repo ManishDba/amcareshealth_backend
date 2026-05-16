@@ -37,7 +37,34 @@ app.use("/api/v1", require("./routes/v1"));
 // ─── Legacy Routes (Backward compatibility for current frontend) ──
 app.use("/", require("./routes/public.routes"));
 app.use("/", require("./routes/private.routes"));
+
+// Health check and Route listing for deployment debugging
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "UP", 
+    timestamp: new Date().toISOString(),
+    service: "AmCaresHealth API"
+  });
+});
+
+app.get("/api/debug-routes", (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routes.push(`${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          routes.push(`${Object.keys(handler.route.methods)} ${handler.route.path}`);
+        }
+      });
+    }
+  });
+  res.json({ success: true, routes });
+});
+
 console.log('✅ Routes mounted.');
+
 
 // ─── 404 Handler ─────────────────────────────────────────────
 app.use((req, res) => {

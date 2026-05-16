@@ -1,11 +1,13 @@
 require("dotenv").config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
+
 const PGHOST = process.env.PGHOST;
 const PGUSER = process.env.PGUSER;
 const PGDATABASE = process.env.PGDATABASE;
 const PGPASSWORD = process.env.PGPASSWORD;
 const PGPORT = process.env.PGPORT;
+const DATABASE_URL = process.env.DATABASE_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const SMS_COUNTRY_USER = process.env.SMS_COUNTRY_USER;
@@ -27,6 +29,7 @@ module.exports = {
     PGDATABASE,
     PGPASSWORD,
     PGPORT,
+    DATABASE_URL,
     JWT_SECRET,
     SMS_COUNTRY_USER,
     SMS_COUNTRY_PASSWORD,

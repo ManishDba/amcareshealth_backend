@@ -6,7 +6,9 @@
     "start": "node ./src/index.js",
     "dev": "nodemon --inspect ./src/index.js",
     "db:migrate": "node ./src/config/db.migrate.js",
-    "db:seeder": "node ./src/config/db.seeder.js"
+    "db:seeder": "node ./src/config/db.seeder.js",
+    "build": "node ./src/config/db.migrate.js"
+
   },
   "dependencies": {
     "axios": "^1.6.0",
@@ -24,6 +26,7 @@
     "nodemailer": "^8.0.7",
     "nodemon": "^3.0.1",
     "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.33.0",
     "twilio": "^4.19.0"
   },

@@ -13,5 +13,6 @@ router.use("/users", require("./users.routes"));
 router.use("/doctors", require("./doctors.routes"));
 router.use("/appointments", require("./appointments.routes"));
 router.use("/notifications", require("./notifications.routes"));
+router.use("/transplant", require("./transplant.routes"));
 
 module.exports = router;

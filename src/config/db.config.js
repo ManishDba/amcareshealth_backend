@@ -1,22 +1,45 @@
 const { Sequelize } = require("sequelize");
-const { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT } = require("../../env");
+const { PGHOST, PGUSER, PGDATABASE, PGPASSWORD, PGPORT, DATABASE_URL } = require("../../env");
 
-const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
-    host: PGHOST,
-    port: PGPORT || 5432,
-    dialect: "postgres",
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
-    pool: {
-        max: 20,      // Production-safe pool size
-        min: 2,
-        acquire: 30000,
-        idle: 10000,
-    },
-    define: {
-        underscored: false,  // Keep camelCase columns
-        freezeTableName: false,
-    },
-});
+const sequelize = DATABASE_URL 
+    ? new Sequelize(DATABASE_URL, {
+        dialect: "postgres",
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false
+            }
+        },
+        logging: process.env.NODE_ENV === 'development' ? console.log : false,
+        pool: {
+            max: 10,
+            min: 0,
+            acquire: 30000,
+            idle: 10000,
+        },
+
+        define: {
+            underscored: false,
+            freezeTableName: false,
+        },
+    })
+    : new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
+        host: PGHOST,
+        port: PGPORT || 5432,
+        dialect: "postgres",
+        logging: process.env.NODE_ENV === 'development' ? console.log : false,
+        pool: {
+            max: 20,
+            min: 2,
+            acquire: 30000,
+            idle: 10000,
+        },
+        define: {
+            underscored: false,
+            freezeTableName: false,
+        },
+    });
+
 
 const connectionTest = async () => {
     const maxRetries = 5;
