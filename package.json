@@ -2,6 +2,7 @@
   "name": "amcareshealth_backend",
   "version": "1.0.0",
   "main": "index.js",
+
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon --inspect ./src/index.js",
