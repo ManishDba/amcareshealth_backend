@@ -31,7 +31,11 @@
     "sequelize": "^6.33.0",
     "twilio": "^4.19.0"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "author": "",
+
   "license": "ISC",
   "description": ""
 }
