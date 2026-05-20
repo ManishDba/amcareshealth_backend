@@ -1,6 +1,7 @@
 const { models } = require("../models");
 const { errorHandler, successHandler } = require("../utils/handler.utils");
 const crypto = require("crypto");
+const emailService = require("../services/email.service");
 
 /**
  * Register a new Organ Transplant request (Recipient or Donor)
@@ -37,6 +38,13 @@ const registerTransplant = async (req, res) => {
       refCode,
       status: "active"
     });
+
+    // 4. Send Confirmation and Notification Emails (Async)
+    // Attempt to fetch the user's main email/name if we need it
+    const user = await models.users.findByPk(userId, { attributes: ["name", "email"] }) || { name: patientName, email };
+    
+    emailService.sendTransplantEmail(registration, user).catch(err => console.error("Email failed:", err));
+    emailService.sendTransplantNotification(registration, user).catch(err => console.error("Notification failed:", err));
 
     return successHandler(res, {
       message: "Transplant registration successful",

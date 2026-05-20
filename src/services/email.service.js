@@ -226,9 +226,108 @@ const sendAppointmentNotification = async (appointment, user, doctor) => {
   });
 };
 
+/**
+ * Template for Organ Transplant Registration Confirmation
+ */
+const sendTransplantEmail = async (registration, user) => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Manrope', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #1D9E75 0%, #0F6E56 100%); padding: 30px; text-align: center; color: white; }
+        .content { padding: 30px; background: #fff; }
+        .details-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1D9E75; }
+        .footer { padding: 20px; text-align: center; font-size: 12px; color: #999; background: #f9f9f9; }
+        .ref-code { font-family: monospace; font-size: 18px; color: #1D9E75; font-weight: bold; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Transplant Registration Received</h1>
+        </div>
+        <div class="content">
+          <p>Hi <strong>${user.name}</strong>,</p>
+          <p>Your organ transplant registration has been successfully recorded in our system. Here are your details:</p>
+          
+          <div class="details-box">
+            <p><strong>Registration ID:</strong> <span class="ref-code">${registration.refCode}</span></p>
+            <p><strong>Type:</strong> ${registration.type.toUpperCase()}</p>
+            <p><strong>Organ:</strong> ${registration.organ.toUpperCase()}</p>
+            <p><strong>Patient Name:</strong> ${registration.patientName}</p>
+            <p><strong>Blood Group:</strong> ${registration.bloodGroup}</p>
+            <p><strong>Urgency:</strong> ${registration.urgency.toUpperCase()}</p>
+            <p><strong>Status:</strong> ACTIVE (AI Scanning NOTTO database)</p>
+          </div>
+
+          <p>Our AI is actively scanning the database for a compatible match. You'll be notified immediately via SMS and email the moment a match is found.</p>
+          <p>Keep your phone accessible 24/7.</p>
+          <p>Best regards,<br>The AmCaresHealth Team</p>
+        </div>
+        <div class="footer">
+          &copy; 2026 AmCaresHealth. All rights reserved.<br>
+          NOTTO Partnered
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: registration.email || user.email,
+    subject: `Registration Confirmed: ${registration.refCode}`,
+    html,
+  });
+};
+
+/**
+ * Send Notification Email to Organization for New Transplant Registration
+ */
+const sendTransplantNotification = async (registration, user) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h2 style="color: #1D9E75;">New Transplant Registration</h2>
+      <p>A new organ transplant registration has been submitted via the mobile app.</p>
+      
+      <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Registration Details</h3>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><strong>Ref Code:</strong> ${registration.refCode}</li>
+        <li><strong>Type:</strong> ${registration.type.toUpperCase()}</li>
+        <li><strong>Organ:</strong> ${registration.organ.toUpperCase()}</li>
+        <li><strong>Patient Name:</strong> ${registration.patientName}</li>
+        <li><strong>Age:</strong> ${registration.age}</li>
+        <li><strong>Blood Group:</strong> ${registration.bloodGroup}</li>
+        <li><strong>City:</strong> ${registration.city}</li>
+        <li><strong>Urgency:</strong> ${registration.urgency.toUpperCase()}</li>
+        <li><strong>Phone:</strong> ${registration.phone}</li>
+        <li><strong>Email:</strong> ${registration.email}</li>
+      </ul>
+
+      <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Medical History</h3>
+      <p>${registration.medicalHistory || "N/A"}</p>
+
+      <p style="margin-top: 20px; font-size: 12px; color: #777;">
+        <strong>Registered By Account:</strong> ${user.name} (${user.email})
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: "amcareshealthorganization@gmail.com",
+    subject: `🚨 New Transplant Req: ${registration.refCode} (${registration.organ.toUpperCase()})`,
+    html,
+  });
+};
+
 module.exports = {
   sendRegistrationEmail,
   sendRegistrationNotification,
   sendAppointmentEmail,
   sendAppointmentNotification,
+  sendTransplantEmail,
+  sendTransplantNotification,
 };
