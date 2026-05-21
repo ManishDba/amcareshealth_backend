@@ -52,11 +52,11 @@ const sendRegistrationEmail = async (user) => {
       <style>
         body { font-family: 'Manrope', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 600px; margin: 20px auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .header { background: linear-gradient(135deg, #8B2635 0%, #5E1A24 100%); padding: 30px; text-align: center; color: white; }
+        .header { background: linear-gradient(135deg, #3D6080 0%, #14182D 100%); padding: 30px; text-align: center; color: white; }
         .content { padding: 30px; background: #fff; }
         .footer { padding: 20px; text-align: center; font-size: 12px; color: #999; background: #f9f9f9; }
-        .button { display: inline-block; padding: 12px 24px; background: #8B2635; color: white; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
-        .welcome-msg { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #8B2635; }
+        .button { display: inline-block; padding: 12px 24px; background: #3D6080; color: white; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
+        .welcome-msg { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #3D6080; }
       </style>
     </head>
     <body>
@@ -125,11 +125,11 @@ const sendAppointmentEmail = async (appointment, user, doctor) => {
       <style>
         body { font-family: 'Manrope', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 600px; margin: 20px auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .header { background: linear-gradient(135deg, #2D3E50 0%, #1A252F 100%); padding: 30px; text-align: center; color: white; }
+        .header { background: linear-gradient(135deg, #3D6080 0%, #14182D 100%); padding: 30px; text-align: center; color: white; }
         .content { padding: 30px; background: #fff; }
-        .details-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8B2635; }
+        .details-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3D6080; }
         .footer { padding: 20px; text-align: center; font-size: 12px; color: #999; background: #f9f9f9; }
-        .ref-code { font-family: monospace; font-size: 18px; color: #8B2635; font-weight: bold; }
+        .ref-code { font-family: monospace; font-size: 18px; color: #3D6080; font-weight: bold; }
         .status { display: inline-block; padding: 4px 12px; background: #d4edda; color: #155724; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
       </style>
     </head>
@@ -190,7 +190,7 @@ const sendAppointmentEmail = async (appointment, user, doctor) => {
 const sendAppointmentNotification = async (appointment, user, doctor) => {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #8B2635;">New Appointment Booked</h2>
+      <h2 style="color: #3D6080;">New Appointment Booked</h2>
       <p>A new appointment has been scheduled via the mobile app.</p>
       
       <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Schedule Info</h3>
@@ -238,11 +238,11 @@ const sendTransplantEmail = async (registration, user) => {
       <style>
         body { font-family: 'Manrope', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 600px; margin: 20px auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .header { background: linear-gradient(135deg, #1D9E75 0%, #0F6E56 100%); padding: 30px; text-align: center; color: white; }
+        .header { background: linear-gradient(135deg, #3D6080 0%, #14182D 100%); padding: 30px; text-align: center; color: white; }
         .content { padding: 30px; background: #fff; }
-        .details-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1D9E75; }
+        .details-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3D6080; }
         .footer { padding: 20px; text-align: center; font-size: 12px; color: #999; background: #f9f9f9; }
-        .ref-code { font-family: monospace; font-size: 18px; color: #1D9E75; font-weight: bold; }
+        .ref-code { font-family: monospace; font-size: 18px; color: #3D6080; font-weight: bold; }
       </style>
     </head>
     <body>
@@ -290,7 +290,7 @@ const sendTransplantEmail = async (registration, user) => {
 const sendTransplantNotification = async (registration, user) => {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #1D9E75;">New Transplant Registration</h2>
+      <h2 style="color: #3D6080;">New Transplant Registration</h2>
       <p>A new organ transplant registration has been submitted via the mobile app.</p>
       
       <h3 style="border-bottom: 1px solid #eee; padding-bottom: 8px;">Registration Details</h3>
