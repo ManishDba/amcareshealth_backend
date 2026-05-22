@@ -47,19 +47,26 @@ const bookAppointment = async (req, res) => {
 
     await t.commit();
 
-    // --- Send Confirmation Email (Async) ---
-    try {
-      const fullUser = await models.users.findByPk(userId);
-      const fullDoctor = await models.doctors.findByPk(doctorId);
-      if (fullUser && fullUser.email) {
-        await sendAppointmentEmail(appointment, fullUser, fullDoctor);
+    // --- Send Confirmation Email (Fire-and-forget, non-blocking) ---
+    // Don't await — send response immediately, emails go out in background
+    const emailUserId = userId;
+    const emailDoctorId = doctorId;
+    const emailAppointment = appointment;
+
+    Promise.resolve().then(async () => {
+      try {
+        const fullUser = await models.users.findByPk(emailUserId);
+        const fullDoctor = await models.doctors.findByPk(emailDoctorId);
+        if (fullUser && fullUser.email) {
+          await sendAppointmentEmail(emailAppointment, fullUser, fullDoctor);
+        }
+        if (fullUser && fullDoctor) {
+          await sendAppointmentNotification(emailAppointment, fullUser, fullDoctor);
+        }
+      } catch (emailError) {
+        console.error("Failed to send appointment email:", emailError.message);
       }
-      if (fullUser && fullDoctor) {
-        await sendAppointmentNotification(appointment, fullUser, fullDoctor);
-      }
-    } catch (emailError) {
-      console.error("Failed to send appointment email:", emailError);
-    }
+    });
 
     return successHandler(res, {
       message: "Appointment booked successfully",

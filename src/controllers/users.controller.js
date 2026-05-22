@@ -102,20 +102,19 @@ const signup = async (req, res) => {
       address: address || null,
     });
 
-    // --- Send Welcome Email ---
-    if (user.email) {
+    // --- Send Welcome Email (Fire-and-forget, non-blocking) ---
+    // Don't await — send response immediately, emails go out in background
+    const emailUser = user;
+    Promise.resolve().then(async () => {
       try {
-        await sendRegistrationEmail(user);
+        if (emailUser.email) {
+          await sendRegistrationEmail(emailUser);
+        }
+        await sendRegistrationNotification(emailUser);
       } catch (emailError) {
-        console.error("Failed to send registration email:", emailError);
+        console.error("Failed to send registration email:", emailError.message);
       }
-    }
-
-    try {
-      await sendRegistrationNotification(user);
-    } catch (notificationError) {
-      console.error("Failed to send registration notification:", notificationError);
-    }
+    });
 
     // Generate JWT token for immediate login after registration
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
