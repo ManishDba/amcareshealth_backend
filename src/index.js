@@ -4,6 +4,10 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const cors = require("cors");
 const path = require("path");
+const compression = require("compression");
+const timeout = require("connect-timeout");
+
+const Logger = require("./lib/logger");
 
 const { PORT } = require("../env");
 const { models, sequelize } = require("./models/index");
@@ -15,19 +19,50 @@ const app = express();
 const server = http.createServer(app);
 
 console.log('📦 Loading models...');
-// Initialize models & connection
-sequelize.authenticateApp(); 
-console.log('✅ Models loaded.');
+// Initialize models & connection in background (non-blocking)
+// authenticateApp() does its own logging and will not block server start.
+sequelize.authenticateApp();
+Logger.info('Database authenticate initiated (background).');
 
 
 
 // ─── Global Middleware ────────────────────────────────────────
 console.log('🛡️ Configuring middleware...');
+
+// Lightweight health endpoint should be mounted BEFORE heavy middleware
+// to avoid unnecessary work (no DB calls, no body parsing, etc.).
+let healthCache = { value: { status: "ok" }, ts: 0, ttl: 30 * 1000 };
+app.get('/health', (req, res) => {
+  const now = Date.now();
+  if (now - healthCache.ts < healthCache.ttl) {
+    res.setHeader('Connection', 'keep-alive');
+    return res.json(healthCache.value);
+  }
+  // No DB access here; just lightweight response and cache update
+  healthCache.ts = now;
+  healthCache.value = { status: 'ok' };
+  res.setHeader('Connection', 'keep-alive');
+  res.json(healthCache.value);
+});
+
+// Compression should be early
+app.use(compression());
 app.use(cors({ origin: "*" }));
 app.use(helmet());
+// Apply a global request timeout (express middleware)
+app.use(timeout('30s'));
+// JSON/body parsing for routes that need it
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(apiRateLimit); // Global rate limiting
+// app.use(apiRateLimit); // Global rate limiting (enable selectively)
+
+// Timeout handler middleware: if a request times out, end early.
+app.use((req, res, next) => {
+  if (req.timedout) return;
+  // set keep-alive header by default for clients that respect it
+  res.setHeader('Connection', 'keep-alive');
+  next();
+});
 
 // Serve uploaded files as static assets
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
@@ -88,7 +123,17 @@ process.on("SIGINT", () => {
   });
 });
 
-app.listen(PORT, () => {
+// Tune server keep-alive to reduce connection churn on platforms like Render
+server.keepAliveTimeout = 60 * 1000; // 60s
+// headersTimeout should be slightly larger than keepAliveTimeout
+server.headersTimeout = 65 * 1000; // 65s
+
+// Start server
+server.listen(PORT, () => {
+  Logger.info('AmCaresHealth API Server started', {
+    port: PORT,
+    apiV1: `/api/v1`,
+  });
   console.log(`\n🏥 AmCaresHealth API Server`);
   console.log(`   Running at: http://localhost:${PORT}`);
   console.log(`   API v1:     http://localhost:${PORT}/api/v1`);
