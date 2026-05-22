@@ -31,20 +31,26 @@ const authMiddleware = async (req, res, next) => {
     // Verify the token using JWT_SECRET from environment variables
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Backward compatibility: old tokens may not have 'role'
-    if (!decoded.role) {
-      try {
-        const user = await models.users.findByPk(decoded.userId, {
-          attributes: ["role"],
-        });
-        decoded.role = user ? user.role : "patient";
-      } catch {
-        decoded.role = "patient";
-      }
+    // Verify user exists in the database (handles deleted/stale tokens)
+    const user = await models.users.findByPk(decoded.userId, {
+      attributes: ["id"],
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User account no longer exists or access token is invalid.",
+        code: "USER_NOT_FOUND",
+      });
     }
 
-    // Attach decoded user info to the request object
-    req.user = decoded;
+    const role = decoded.role || "patient";
+
+    // Attach verified user info to the request object
+    req.user = {
+      userId: user.id,
+      role,
+    };
 
     // Proceed to the next middleware or route handler
     next();
