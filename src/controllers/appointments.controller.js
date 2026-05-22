@@ -7,7 +7,26 @@ const bookAppointment = async (req, res) => {
   const t = await sequelize.transaction();
   try {
     const { doctorId, slotId, consultType, patientDetails } = req.body;
-    const userId = req.user.userId; // Based on auth middleware common practice
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      await t.rollback();
+      return res.status(401).json({
+        success: false,
+        message: "Authenticated user not found. Please login again.",
+        code: "USER_NOT_FOUND",
+      });
+    }
+
+    const authenticatedUser = await models.users.findByPk(userId);
+    if (!authenticatedUser) {
+      await t.rollback();
+      return res.status(401).json({
+        success: false,
+        message: "User account no longer exists.",
+        code: "USER_NOT_FOUND",
+      });
+    }
 
     if (!doctorId || !slotId || !patientDetails) {
       await t.rollback();
