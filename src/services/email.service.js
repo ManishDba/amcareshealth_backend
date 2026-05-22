@@ -7,10 +7,29 @@ const {
   FROM_EMAIL 
 } = require("../../env");
 
-const transporter = nodemailer.createTransport({
+// Validate SMTP configuration on startup
+const validateSMTPConfig = () => {
+  const missing = [];
+  if (!SMTP_HOST) missing.push("SMTP_HOST");
+  if (!SMTP_PORT) missing.push("SMTP_PORT");
+  if (!SMTP_USER) missing.push("SMTP_USER");
+  if (!SMTP_PASS) missing.push("SMTP_PASS");
+  if (!FROM_EMAIL) missing.push("FROM_EMAIL");
+  
+  if (missing.length > 0) {
+    console.warn(`⚠️  Missing SMTP config: ${missing.join(", ")}`);
+    console.warn(`📧 Email service will be disabled until config is provided.`);
+    return false;
+  }
+  return true;
+};
+
+const isConfigured = validateSMTPConfig();
+
+const transporter = isConfigured ? nodemailer.createTransport({
   host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: SMTP_PORT == 465, // true for 465, false for other ports
+  port: parseInt(SMTP_PORT, 10),
+  secure: parseInt(SMTP_PORT, 10) === 465, // true for 465, false for 587
   auth: {
     user: SMTP_USER,
     pass: SMTP_PASS,
@@ -18,12 +37,31 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-});
+  logger: process.env.NODE_ENV === 'development', // Enable logging in dev
+  debug: process.env.NODE_ENV === 'development',   // Enable debug in dev
+}) : null;
+
+// Test connection on startup
+if (isConfigured && transporter) {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error("❌ SMTP connection failed:", error.message);
+    } else {
+      console.log("✅ SMTP connection verified - ready to send emails");
+    }
+  });
+}
 
 /**
  * Send an email with a modern HTML template
  */
 const sendEmail = async ({ to, subject, html }) => {
+  // Check if email is disabled
+  if (!isConfigured || !transporter) {
+    console.warn(`⚠️  Email service not configured. Skipping email to ${to}`);
+    return { skipped: true, reason: "SMTP not configured" };
+  }
+
   try {
     const info = await transporter.sendMail({
       from: `"AmCaresHealth" <${FROM_EMAIL}>`,
@@ -31,12 +69,16 @@ const sendEmail = async ({ to, subject, html }) => {
       subject,
       html,
     });
-    console.log("Email sent: %s", info.messageId);
+    console.log(`✅ Email sent to ${to} - MessageID: ${info.messageId}`);
     return info;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error(`❌ Error sending email to ${to}:`, error.message);
+    // Log the full error in dev mode
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Full error:", error);
+    }
     // Don't throw error to avoid breaking the main flow
-    return null;
+    return { error: error.message };
   }
 };
 
