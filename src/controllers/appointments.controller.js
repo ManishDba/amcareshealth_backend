@@ -10,7 +10,32 @@ const bookAppointment = async (req, res) => {
     const userId = req.user.userId; // Based on auth middleware common practice
 
     if (!doctorId || !slotId || !patientDetails) {
+      await t.rollback();
       return errorHandler(res, new Error("Missing required fields"), 400);
+    }
+
+    let parsedPatientDetails = patientDetails;
+    if (typeof patientDetails === 'string') {
+      try {
+        parsedPatientDetails = JSON.parse(patientDetails);
+      } catch (e) {
+        await t.rollback();
+        return errorHandler(res, new Error("Invalid patientDetails JSON format"), 400);
+      }
+    }
+
+    if (!parsedPatientDetails || typeof parsedPatientDetails !== 'object') {
+      await t.rollback();
+      return errorHandler(res, new Error("patientDetails must be an object"), 400);
+    }
+
+    // Ensure reasons is always an array of strings
+    if (!Array.isArray(parsedPatientDetails.reasons)) {
+      if (typeof parsedPatientDetails.reasons === 'string' && parsedPatientDetails.reasons.trim() !== '') {
+        parsedPatientDetails.reasons = [parsedPatientDetails.reasons.trim()];
+      } else {
+        parsedPatientDetails.reasons = [];
+      }
     }
 
     // 1. Check if slot exists and is available
@@ -38,7 +63,7 @@ const bookAppointment = async (req, res) => {
         date: slot.date,
         time: slot.time,
         consultType: consultType || "clinic",
-        patientDetails,
+        patientDetails: parsedPatientDetails,
         refCode,
         status: "confirmed", // Defaulting to confirmed for simplicity, or "pending" as per requirement
       },
@@ -73,7 +98,11 @@ const bookAppointment = async (req, res) => {
       appointment
     });
   } catch (error) {
-    await t.rollback();
+    try {
+      await t.rollback();
+    } catch (rollbackError) {
+      console.error("Failed to rollback transaction:", rollbackError.message);
+    }
     return errorHandler(res, error);
   }
 };

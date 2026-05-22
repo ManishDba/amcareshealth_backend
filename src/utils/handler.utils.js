@@ -4,7 +4,7 @@ const errorHandler = (res, error, status = 400) => {
 }
 
 const successHandler = (res, data) => {
-    res.status(200).json(data);
+    res.status(200).json({ success: true, ...data });
 }
 
 const handlerWithMsg = (res, msg, code = 200) => {
