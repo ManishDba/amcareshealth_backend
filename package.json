@@ -8,7 +8,10 @@
     "dev": "nodemon --inspect ./src/index.js",
     "db:migrate": "node ./src/config/db.migrate.js",
     "db:seeder": "node ./src/config/db.seeder.js",
-    "build": "node ./src/config/db.migrate.js"
+    "build": "node ./src/config/db.migrate.js",
+    "generate-slots-30": "node ./src/scripts/generate_slots_30days.js",
+    "generate-slots-15": "node ./src/scripts/generate_slots.js",
+    "generate-slots-test": "node ./src/scripts/add_test_slots.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
