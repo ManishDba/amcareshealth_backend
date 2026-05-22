@@ -104,9 +104,18 @@ const signup = async (req, res) => {
 
     // --- Send Welcome Email ---
     if (user.email) {
-      await sendRegistrationEmail(user);
+      try {
+        await sendRegistrationEmail(user);
+      } catch (emailError) {
+        console.error("Failed to send registration email:", emailError);
+      }
     }
-    await sendRegistrationNotification(user);
+
+    try {
+      await sendRegistrationNotification(user);
+    } catch (notificationError) {
+      console.error("Failed to send registration notification:", notificationError);
+    }
 
     // Generate JWT token for immediate login after registration
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
