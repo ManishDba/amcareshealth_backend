@@ -37,6 +37,7 @@ const transporter = isConfigured ? nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+  family: 4, // Force IPv4 to prevent connection timeout/ENETUNREACH in environments without IPv6 support (like Render)
   logger: process.env.NODE_ENV === 'development', // Enable logging in dev
   debug: process.env.NODE_ENV === 'development',   // Enable debug in dev
 }) : null;

@@ -17,6 +17,8 @@ const SMTP_PORT = process.env.SMTP_PORT;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const FROM_EMAIL = process.env.FROM_EMAIL;
+const SMTP_TIMEOUT = process.env.SMTP_TIMEOUT || 10000;
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 
 
@@ -38,4 +40,6 @@ module.exports = {
     SMTP_USER,
     SMTP_PASS,
     FROM_EMAIL
+    ,SMTP_TIMEOUT
+    ,SENDGRID_API_KEY
 }
