@@ -2,22 +2,33 @@ const { models } = require("../models");
 const { errorHandler, successHandler } = require("../utils/handler.utils");
 const { Op } = require("sequelize");
 
+const allowedSpecs = ['Liver Surgeon', 'Heart Surgeon', 'Kidney Surgeon'];
+
 const getAllDoctors = async (req, res) => {
   try {
-    const { search, specialization } = req.query;
+    const { search } = req.query;
     let where = {};
 
     if (search) {
       where.name = { [Op.iLike]: `%${search}%` };
     }
 
-    if (specialization) {
-      where.specialization = specialization;
-    }
+    // Restrict to allowed specializations only
+    where[Op.and] = where[Op.and] || [];
+    // Case‑insensitive filter for allowed specializations
+    const specFilters = allowedSpecs.map(spec => ({ specialization: { [Op.iLike]: spec } }));
+    where[Op.and].push({ [Op.or]: specFilters });
 
     const doctors = await models.doctors.findAll({
       where,
-      order: [["name", "ASC"]],
+      // Order to put Dr. Subash Gupta first, then by name
+      order: [
+        [
+          models.sequelize.literal(`CASE WHEN name = 'Dr. Subash Gupta' THEN 0 ELSE 1 END`),
+          'ASC',
+        ],
+        ["name", "ASC"],
+      ],
     });
 
     return successHandler(res, { doctors });
@@ -46,17 +57,25 @@ const getAvailableSlots = async (req, res) => {
     const { id } = req.params;
     const { date } = req.query;
 
-    if (!date) {
-      return errorHandler(res, new Error("Date is required"), 400);
+    // If a specific date is provided, filter by that date.
+    // Otherwise, return unbooked slots for the next 30 days.
+    let slotWhere = { doctorId: id, isBooked: false };
+    if (date) {
+      slotWhere.date = date;
+    } else {
+      const dates = [];
+      const today = new Date();
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        dates.push(d.toISOString().split('T')[0]);
+      }
+      slotWhere.date = { [Op.in]: dates };
     }
 
     const slots = await models.doctorSlots.findAll({
-      where: {
-        doctorId: id,
-        date,
-        isBooked: false,
-      },
-      order: [["time", "ASC"]],
+      where: slotWhere,
+      order: [["date", "ASC"], ["time", "ASC"]],
     });
 
     return successHandler(res, { slots });
